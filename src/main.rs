@@ -50,6 +50,7 @@ fn main() {
             let ode = Roessler::system_from_config(&conf);
             match conf.solver.name.as_str() {
                 "RK4" => { ode_match_arm!(eom::explicit::RK4<Roessler>, ode, conf.solver); },
+                "euler" => { ode_match_arm!(eom::explicit::Euler<Roessler>, ode, conf.solver); },
                 _ => panic!("unknown solver"),
             }
         },
@@ -57,6 +58,7 @@ fn main() {
             let ode = Lorenz63::system_from_config(&conf);
             match conf.solver.name.as_str() {
                 "RK4" => { ode_match_arm!(eom::explicit::RK4<Lorenz63>, ode, conf.solver); },
+                "euler" => { ode_match_arm!(eom::explicit::Euler<Lorenz63>, ode, conf.solver); },
                 _ => panic!("unknown solver"),
             }
         },
