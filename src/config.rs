@@ -1,23 +1,33 @@
 use std::convert::TryInto;
 
+#[macro_export]
+macro_rules! lookup_parameter {
+    ($name:expr, $conf:expr) => {
+        $conf.system.parameter.get($name)
+            .expect(concat!("parameter ", $name, " is missing"))
+            .as_float()
+            .expect(concat!("parameter ", $name, " must be a float"))
+    };
+}
+
 #[derive(Debug, Clone)]
 pub struct Config {
-    system: System,
-    solver: Solver,
+    pub system: System,
+    pub solver: Solver,
 }
 
 #[derive(Debug, Clone)]
 pub struct System {
-    name: String,
-    parameter: toml::value::Table,
+    pub name: String,
+    pub parameter: toml::value::Table,
 }
 
 #[derive(Debug, Clone)]
 pub struct Solver {
-    name: String,
-    step_range: (usize, Option<usize>),
-    step_size: Option<f64>,
-    init: Option<Vec<f64>>,
+    pub name: String,
+    pub step_range: (usize, Option<usize>),
+    pub step_size: Option<f64>,
+    pub init: Option<Vec<f64>>,
 }
 
 pub fn read_config(conf: &str) -> Config {
