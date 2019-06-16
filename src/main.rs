@@ -23,6 +23,16 @@ macro_rules! print_ode_ts {
     };
 }
 
+macro_rules! ode_match_arm {
+    ($scheme:ty, $ode:expr, $conf_solver:expr) => {
+        print_ode_ts!($scheme, $ode,
+                      &$conf_solver.init.unwrap(),
+                      $conf_solver.step_size.unwrap(),
+                      $conf_solver.step_range.0,
+                      $conf_solver.step_range.1);
+    };
+}
+
 fn main() {
     let mut handle = std::io::stdin();
     let mut conf = String::new();
@@ -35,28 +45,14 @@ fn main() {
         "roessler" => {
             let ode = Roessler::system_from_config(&conf);
             match conf.solver.name.as_str() {
-                "RK4" => { print_ode_ts!(
-                    eom::explicit::RK4<Roessler>,
-                    ode,
-                    &conf.solver.init.unwrap(),
-                    conf.solver.step_size.unwrap(),
-                    conf.solver.step_range.0,
-                    conf.solver.step_range.1);
-                },
+                "RK4" => { ode_match_arm!(eom::explicit::RK4<Roessler>, ode, conf.solver); },
                 _ => panic!("unknown solver"),
             }
         },
         "lorenz63" => {
             let ode = Lorenz63::system_from_config(&conf);
             match conf.solver.name.as_str() {
-                "RK4" => { print_ode_ts!(
-                    eom::explicit::RK4<Lorenz63>,
-                    ode,
-                    &conf.solver.init.unwrap(),
-                    conf.solver.step_size.unwrap(),
-                    conf.solver.step_range.0,
-                    conf.solver.step_range.1);
-                },
+                "RK4" => { ode_match_arm!(eom::explicit::RK4<Lorenz63>, ode, conf.solver); },
                 _ => panic!("unknown solver"),
             }
         },
