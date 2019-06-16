@@ -16,7 +16,11 @@ macro_rules! print_ode_ts {
             let v = ts.next().unwrap();
             if t >= $range_start {
                 let time = t as f64 * $step_size;
-                println!("{:.8} {:.8} {:.8} {:.8}", time, v[0], v[1], v[2]);
+                print!("{:.8}", time);
+                for x in v.iter() {
+                    print!(" {:.8}", x);
+                }
+                println!("");
             }
             t += 1;
         }
