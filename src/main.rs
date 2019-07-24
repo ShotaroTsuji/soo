@@ -28,12 +28,12 @@ macro_rules! print_ode_ts {
 }
 
 macro_rules! ode_match_arm {
-    ($scheme:ty, $ode:expr, $conf_solver:expr) => {
+    ($scheme:ty, $ode:expr, $conf_generate:expr) => {
         print_ode_ts!($scheme, $ode,
-                      &$conf_solver.init.unwrap(),
-                      $conf_solver.step_size.unwrap(),
-                      $conf_solver.step_range.0,
-                      $conf_solver.step_range.1);
+                      &$conf_generate.init.unwrap(),
+                      $conf_generate.step_size.unwrap(),
+                      $conf_generate.step_range.0,
+                      $conf_generate.step_range.1);
     };
 }
 
@@ -43,22 +43,21 @@ fn main() {
     handle.read_to_string(&mut conf).unwrap();
 
     let conf = soo::config::read_config(&conf);
-    println!("{:#?}", conf);
 
     match conf.system.name.as_str() {
         "roessler" => {
             let ode = Roessler::system_from_config(&conf);
-            match conf.solver.name.as_str() {
-                "RK4" => { ode_match_arm!(eom::explicit::RK4<Roessler>, ode, conf.solver); },
-                "euler" => { ode_match_arm!(eom::explicit::Euler<Roessler>, ode, conf.solver); },
+            match conf.generate.solver.as_str() {
+                "RK4" => { ode_match_arm!(eom::explicit::RK4<Roessler>, ode, conf.generate); },
+                "euler" => { ode_match_arm!(eom::explicit::Euler<Roessler>, ode, conf.generate); },
                 _ => panic!("unknown solver"),
             }
         },
         "lorenz63" => {
             let ode = Lorenz63::system_from_config(&conf);
-            match conf.solver.name.as_str() {
-                "RK4" => { ode_match_arm!(eom::explicit::RK4<Lorenz63>, ode, conf.solver); },
-                "euler" => { ode_match_arm!(eom::explicit::Euler<Lorenz63>, ode, conf.solver); },
+            match conf.generate.solver.as_str() {
+                "RK4" => { ode_match_arm!(eom::explicit::RK4<Lorenz63>, ode, conf.generate); },
+                "euler" => { ode_match_arm!(eom::explicit::Euler<Lorenz63>, ode, conf.generate); },
                 _ => panic!("unknown solver"),
             }
         },

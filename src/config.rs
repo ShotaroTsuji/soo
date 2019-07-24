@@ -13,7 +13,7 @@ macro_rules! lookup_parameter {
 #[derive(Debug, Clone)]
 pub struct Config {
     pub system: System,
-    pub solver: Solver,
+    pub generate: Generate,
 }
 
 #[derive(Debug, Clone)]
@@ -23,8 +23,8 @@ pub struct System {
 }
 
 #[derive(Debug, Clone)]
-pub struct Solver {
-    pub name: String,
+pub struct Generate {
+    pub solver: String,
     pub step_range: (usize, Option<usize>),
     pub step_size: Option<f64>,
     pub init: Option<Vec<f64>>,
@@ -55,17 +55,17 @@ pub fn read_config(conf: &str) -> Config {
         }
     };
 
-    let solver = {
-        let solver = conf.get("solver")
-            .expect("table [solver] is missing");
+    let generate = {
+        let generate = conf.get("generate")
+            .expect("table [generate] is missing");
 
-        let name = solver.get("name")
+        let solver = generate.get("solver")
             .expect("solver name is missing")
             .as_str()
             .expect("solver name must be a string")
             .to_string();
 
-        let step = solver.get("step")
+        let step = generate.get("step")
             .expect("solver.step is missing")
             .as_table()
             .expect("solver.step must be a table");
@@ -94,14 +94,14 @@ pub fn read_config(conf: &str) -> Config {
             .map(|size| size.as_float()
                  .expect("step size must be float"));
 
-        let init = solver.get("init")
+        let init = generate.get("init")
             .map(|init| init.as_array().expect("init must be an array"))
             .map(|init| init.iter()
                  .map(|value| value.as_float().expect("init value must be float"))
                  .collect::<Vec<f64>>());
 
-        Solver {
-            name: name,
+        Generate {
+            solver: solver,
             step_range: (step_range_start, step_range_end),
             step_size: step_size,
             init: init,
@@ -110,6 +110,6 @@ pub fn read_config(conf: &str) -> Config {
 
     Config {
         system: system,
-        solver: solver,
+        generate: generate,
     }
 }
