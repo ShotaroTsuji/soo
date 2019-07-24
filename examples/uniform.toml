@@ -1,0 +1,6 @@
+[system]
+name = "uniform"
+parameter = { low = -1.0, high = 1.0 }
+
+[generate]
+step.range = { start = 0, end = 1000 }

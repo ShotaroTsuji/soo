@@ -3,6 +3,23 @@ use soo::SystemFromConfig;
 use eom::traits::Scheme;
 use eom::ode::roessler::Roessler;
 use eom::ode::lorenz63::Lorenz63;
+use rand::distributions::Uniform;
+use rand_distr::{Distribution, Normal};
+
+macro_rules! print_dist_ts {
+    ($dist:expr, $range_start:expr, $range_end:expr) => {
+        let mut t = 0;
+        let mut rng = rand::thread_rng();
+        loop {
+            if let Some(end) = $range_end {
+                if t > end { break; }
+            }
+            let v = $dist.sample(&mut rng);
+            println!("{:.8}", v);
+            t += 1;
+        }
+    };
+}
 
 macro_rules! print_ode_ts {
     ($solver:ty, $ode:expr, $init:expr, $step_size:expr, $range_start:expr, $range_end:expr) => {
@@ -60,6 +77,14 @@ fn main() {
                 "euler" => { ode_match_arm!(eom::explicit::Euler<Lorenz63>, ode, conf.generate); },
                 _ => panic!("unknown solver"),
             }
+        },
+        "normal" => {
+            let dist = Normal::system_from_config(&conf);
+            print_dist_ts!(dist, conf.generate.step_range.0, conf.generate.step_range.1);
+        },
+        "uniform" => {
+            let dist = Uniform::system_from_config(&conf);
+            print_dist_ts!(dist, conf.generate.step_range.0, conf.generate.step_range.1);
         },
         _ => panic!("unknown system"),
     }

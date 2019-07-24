@@ -1,0 +1,6 @@
+[system]
+name = "normal"
+parameter = { mean = 0.0, std_dev = 1.0 }
+
+[generate]
+step.range = { start = 0, end = 1000 }

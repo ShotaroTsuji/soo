@@ -60,7 +60,7 @@ pub fn read_config(conf: &str) -> Config {
             .expect("table [generate] is missing");
 
         let solver = generate.get("solver")
-            .expect("solver name is missing")
+            .unwrap_or(&toml::Value::String("".into()))
             .as_str()
             .expect("solver name must be a string")
             .to_string();
