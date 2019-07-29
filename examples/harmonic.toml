@@ -1,0 +1,9 @@
+[system]
+name = "harmonic"
+parameter = { omega = 1.0 }
+
+[generate]
+solver = "RK4"
+step.size = 0.01
+step.range = { start = 0, end = 100000 }
+init = [1.0, 0.0]
