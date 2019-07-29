@@ -1,5 +1,6 @@
 use std::io::Read;
 use soo::SystemFromConfig;
+use soo::system::harmonic::Harmonic;
 use eom::traits::Scheme;
 use eom::ode::roessler::Roessler;
 use eom::ode::lorenz63::Lorenz63;
@@ -62,6 +63,14 @@ fn main() {
     let conf = soo::config::read_config(&conf);
 
     match conf.system.name.as_str() {
+        "harmonic" => {
+            let ode = Harmonic::system_from_config(&conf);
+            match conf.generate.solver.as_str() {
+                "RK4" => { ode_match_arm!(eom::explicit::RK4<Harmonic>, ode, conf.generate); },
+                "euler" => { ode_match_arm!(eom::explicit::Euler<Harmonic>, ode, conf.generate); },
+                _ => panic!("unknown solver"),
+            }
+        },
         "roessler" => {
             let ode = Roessler::system_from_config(&conf);
             match conf.generate.solver.as_str() {
