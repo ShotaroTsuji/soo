@@ -34,12 +34,15 @@ macro_rules! print_ode_ts {
             }
             let v = ts.next().unwrap();
             if t >= $range_start {
+                /*
                 let time = t as f64 * $step_size;
                 print!("{:.8}", time);
+                */
+                let mut buf = String::new();
                 for x in v.iter() {
-                    print!(" {:.8}", x);
+                    buf.push_str(&format!("{:.8} ", x));
                 }
-                println!("");
+                println!("{}", buf.trim());
             }
             t += 1;
         }
