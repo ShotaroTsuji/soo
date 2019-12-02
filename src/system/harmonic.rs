@@ -4,12 +4,14 @@ use eom::traits::*;
 #[derive(Debug, Clone, Copy)]
 pub struct Harmonic {
     pub omega: f64,
+    pub alpha: f64,
 }
 
 impl Default for Harmonic {
     fn default() -> Self {
         Harmonic {
-            omega: 1.0
+            omega: 1.0,
+            alpha: 0.0,
         }
     }
 }
@@ -32,7 +34,7 @@ impl Explicit for Harmonic {
         let y = v[1];
 
         v[0] = self.omega * y;
-        v[1] = - self.omega * x;
+        v[1] = -self.omega * x - self.alpha * y;
 
         v
     }
@@ -46,9 +48,11 @@ impl SystemFromConfig for Harmonic {
         assert_eq!(&conf.system.name, "harmonic");
 
         let omega = crate::lookup_parameter!("omega", &conf);
+        let alpha = crate::try_lookup_parameter!("alpha", &conf).unwrap_or(0.0);
 
         Harmonic {
             omega: omega,
+            alpha: alpha,
         }
     }
 }

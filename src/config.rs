@@ -10,6 +10,14 @@ macro_rules! lookup_parameter {
     };
 }
 
+#[macro_export]
+macro_rules! try_lookup_parameter {
+    ($name:expr, $conf:expr) => {
+        $conf.system.parameter.get($name)
+            .map(|v| v.as_float().expect(concat!("parameter ", $name, " must be a float")))
+    };
+}
+
 #[derive(Debug, Clone)]
 pub struct Config {
     pub system: System,

@@ -1,6 +1,7 @@
 use std::io::Read;
 use soo::SystemFromConfig;
 use soo::system::harmonic::Harmonic;
+use soo::system::vanderpol::VanDerPol;
 use eom::traits::Scheme;
 use eom::ode::roessler::Roessler;
 use eom::ode::lorenz63::Lorenz63;
@@ -24,9 +25,16 @@ macro_rules! print_dist_ts {
 
 macro_rules! print_ode_ts {
     ($solver:ty, $ode:expr, $init:expr, $step_size:expr, $range_start:expr, $range_end:expr) => {
-        let mut t = 0;
+        let mut t = 1;
         let mut teo = <$solver>::new($ode, $step_size);
         let mut ts = eom::adaptor::time_series(ndarray::arr1($init), &mut teo);
+
+        print!("{:.8}", 0.0);
+        for x in $init.clone().iter() {
+            print!(" {:.8}", x);
+        }
+        println!("");
+
         loop {
             if let Some(end) = $range_end {
                 if t > end { break; }
@@ -48,7 +56,7 @@ macro_rules! print_ode_ts {
 macro_rules! ode_match_arm {
     ($scheme:ty, $ode:expr, $conf_generate:expr) => {
         print_ode_ts!($scheme, $ode,
-                      &$conf_generate.init.unwrap(),
+                      $conf_generate.init.as_ref().unwrap(),
                       $conf_generate.step_size.unwrap(),
                       $conf_generate.step_range.0,
                       $conf_generate.step_range.1);
@@ -68,6 +76,14 @@ fn main() {
             match conf.generate.solver.as_str() {
                 "RK4" => { ode_match_arm!(eom::explicit::RK4<Harmonic>, ode, conf.generate); },
                 "euler" => { ode_match_arm!(eom::explicit::Euler<Harmonic>, ode, conf.generate); },
+                _ => panic!("unknown solver"),
+            }
+        },
+        "vanderpol" => {
+            let ode = VanDerPol::system_from_config(&conf);
+            match conf.generate.solver.as_str() {
+                "RK4" => { ode_match_arm!(eom::explicit::RK4<VanDerPol>, ode, conf.generate); },
+                "euler" => { ode_match_arm!(eom::explicit::Euler<VanDerPol>, ode, conf.generate); },
                 _ => panic!("unknown solver"),
             }
         },
