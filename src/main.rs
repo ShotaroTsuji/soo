@@ -7,6 +7,7 @@ use eom::ode::roessler::Roessler;
 use eom::ode::lorenz63::Lorenz63;
 use rand::distributions::Uniform;
 use rand_distr::{Distribution, Normal};
+use nix::sys::signal::{SigAction, SigHandler, SaFlags, SigSet, Signal, sigaction};
 
 macro_rules! print_dist_ts {
     ($dist:expr, $range_start:expr, $range_end:expr) => {
@@ -41,12 +42,15 @@ macro_rules! print_ode_ts {
             }
             let v = ts.next().unwrap();
             if t >= $range_start {
+                /*
                 let time = t as f64 * $step_size;
                 print!("{:.8}", time);
+                */
+                let mut buf = String::new();
                 for x in v.iter() {
-                    print!(" {:.8}", x);
+                    buf.push_str(&format!("{:.8} ", x));
                 }
-                println!("");
+                println!("{}", buf.trim());
             }
             t += 1;
         }
@@ -69,6 +73,10 @@ fn main() {
     handle.read_to_string(&mut conf).unwrap();
 
     let conf = soo::config::read_config(&conf);
+
+    unsafe {
+        sigaction(Signal::SIGPIPE, &SigAction::new(SigHandler::SigDfl, SaFlags::empty(), SigSet::empty())).unwrap();
+    }
 
     match conf.system.name.as_str() {
         "harmonic" => {
