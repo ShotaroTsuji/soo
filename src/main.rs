@@ -2,6 +2,7 @@ use std::io::Read;
 use soo::SystemFromConfig;
 use soo::system::harmonic::Harmonic;
 use soo::system::vanderpol::VanDerPol;
+use soo::system::li::Li;
 use eom::traits::Scheme;
 use eom::ode::roessler::Roessler;
 use eom::ode::lorenz63::Lorenz63;
@@ -30,11 +31,13 @@ macro_rules! print_ode_ts {
         let mut teo = <$solver>::new($ode, $step_size);
         let mut ts = eom::adaptor::time_series(ndarray::arr1($init), &mut teo);
 
-        print!("{:.8}", 0.0);
-        for x in $init.clone().iter() {
-            print!(" {:.8}", x);
+        if $range_start == 0 {
+            print!("{:.8}", 0.0);
+            for x in $init.clone().iter() {
+                print!(" {:.8}", x);
+            }
+            println!("");
         }
-        println!("");
 
         loop {
             if let Some(end) = $range_end {
@@ -91,6 +94,14 @@ fn main() {
             match conf.generate.solver.as_str() {
                 "RK4" => { ode_match_arm!(eom::explicit::RK4<VanDerPol>, ode, conf.generate); },
                 "euler" => { ode_match_arm!(eom::explicit::Euler<VanDerPol>, ode, conf.generate); },
+                _ => panic!("unknown solver"),
+            }
+        },
+        "li" => {
+            let ode = Li::system_from_config(&conf);
+            match conf.generate.solver.as_str() {
+                "RK4" => { ode_match_arm!(eom::explicit::RK4<Li>, ode, conf.generate); },
+                "euler" => { ode_match_arm!(eom::explicit::Euler<Li>, ode, conf.generate); },
                 _ => panic!("unknown solver"),
             }
         },

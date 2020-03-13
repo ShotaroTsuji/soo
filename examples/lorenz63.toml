@@ -5,5 +5,5 @@ parameter = { p = 10.0, r = 28.0, b = 2.6666666666666667 }
 [generate]
 solver = "RK4"
 step.size = 0.01
-step.range = { start = 0, end = 100000 }
+step.range = { start = 1000, end = 20999 }
 init = [1.0, 1.0, 1.0]

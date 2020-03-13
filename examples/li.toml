@@ -1,0 +1,9 @@
+[system]
+name = "li"
+parameter = { }
+
+[generate]
+solver = "RK4"
+step.size = 0.001
+step.range = { start = 5000, end = 24999 }
+init = [10.0, 10.0, 10.0]
